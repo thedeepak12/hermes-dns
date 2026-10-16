@@ -1,0 +1,3 @@
+# HermesDNS
+
+HermesDNS is a self-hosted recursive DNS forwarder designed to give you control over your network's DNS resolution. It sits between your devices and upstream providers and acts as a transparent proxy. It filters queries through blocklists to block ads and trackers on websites and in apps, protects against malware and phishing attacks, provides comprehensive logging and metrics for monitoring, caches responses for performance, and supports modern protocols like DoH and DoT.
