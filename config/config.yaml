@@ -1,0 +1,20 @@
+server:
+  listen: ":53"
+  doh:
+    enabled: false
+    listen: ":443"
+  dot:
+    enabled: false
+    listen: ":853"
+
+upstream:
+  providers:
+    - "https://dns.quad9.net/dns-query"
+    - "https://freedns.controld.com/p0"
+    - "https://cloudflare-dns.com/dns-query"
+  timeout: 5s
+
+cache:
+  enabled: true
+  max_size: 10000
+  default_ttl: 3600
