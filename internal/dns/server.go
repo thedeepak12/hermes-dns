@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/miekg/dns"
+	"github.com/thedeepak12/hermes-dns/internal/cache"
 	"github.com/thedeepak12/hermes-dns/internal/config"
 )
 
@@ -17,16 +18,19 @@ type Server struct {
 	config   *config.Config
 	handler  *Handler
 	resolver *Resolver
+	cache    *cache.Cache
 }
 
 func NewServer(cfg *config.Config) *Server {
 	resolver := NewResolver(cfg)
-	handler := NewHandler(resolver)
+	cache, _ := cache.New(&cfg.Cache)
+	handler := NewHandler(resolver, cache)
 
 	return &Server{
 		config:   cfg,
 		resolver: resolver,
 		handler:  handler,
+		cache:    cache,
 	}
 }
 
@@ -58,6 +62,8 @@ func (s *Server) Start() error {
 		log.Printf("Error during shutdown: %v", err)
 		return err
 	}
+
+	defer s.cache.Close()
 
 	log.Println("DNS server stopped")
 	return nil
