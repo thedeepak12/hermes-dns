@@ -9,10 +9,10 @@ server:
 
 upstream:
   providers:
-    - "https://dns.quad9.net/dns-query"
-    - "https://freedns.controld.com/p0"
-    - "https://cloudflare-dns.com/dns-query"
-  timeout: 5s
+    - "9.9.9.9:53"
+    - "76.76.2.0:53"
+    - "1.1.1.1:53"
+  timeout: 3s
 
 cache:
   enabled: true

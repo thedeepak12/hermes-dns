@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/thedeepak12/hermes-dns/internal/config"
+	"github.com/thedeepak12/hermes-dns/internal/dns"
 )
 
 func main() {
@@ -17,7 +18,9 @@ func main() {
 
 	log.Printf("Configuration loaded successfully")
 	log.Printf("Server listening on: %s", cfg.Server.Listen)
-	log.Printf("Upstream providers: %v", cfg.Upstream.Providers)
 
-	log.Println("HermesDNS started successfully")
+	server := dns.NewServer(cfg)
+	if err := server.Start(); err != nil {
+		log.Fatalf("Server error: %v", err)
+	}
 }
