@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/miekg/dns"
+	"github.com/thedeepak12/hermes-dns/internal/blocklist"
 	"github.com/thedeepak12/hermes-dns/internal/cache"
 	"github.com/thedeepak12/hermes-dns/internal/config"
 )
@@ -35,6 +36,27 @@ func NewServer(cfg *config.Config) *Server {
 }
 
 func (s *Server) Start() error {
+	downloader, err := blocklist.NewDownloader("./blocklists/registry.json")
+	if err != nil {
+		log.Printf("Failed to initialize downloader: %v", err)
+	} else {
+		log.Println("Downloading blocklists...")
+		if err := downloader.DownloadAll(); err != nil {
+			log.Printf("Failed to download blocklists: %v", err)
+		} else {
+			log.Println("Blocklists downloaded successfully")
+		}
+
+		sources := downloader.GetEnabledSources()
+		bl, err := blocklist.New(sources)
+		if err != nil {
+			log.Printf("Failed to load blocklists: %v", err)
+		} else {
+			s.handler.SetBlocklist(bl)
+			log.Printf("Loaded %d blocked domains", bl.Count())
+		}
+	}
+
 	s.server = &dns.Server{
 		Addr:    s.config.Server.Listen,
 		Net:     "udp",

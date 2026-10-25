@@ -4,27 +4,46 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/miekg/dns"
+	"github.com/thedeepak12/hermes-dns/internal/blocklist"
 	"github.com/thedeepak12/hermes-dns/internal/cache"
 )
 
 type Handler struct {
-	resolver *Resolver
-	cache    *cache.Cache
+	resolver  *Resolver
+	cache     *cache.Cache
+	blocklist *blocklist.Blocklist
 }
 
 func NewHandler(resolver *Resolver, c *cache.Cache) *Handler {
 	return &Handler{
-		resolver: resolver,
-		cache:    c,
+		resolver:  resolver,
+		cache:     c,
+		blocklist: nil,
 	}
+}
+
+func (h *Handler) SetBlocklist(bl *blocklist.Blocklist) {
+	h.blocklist = bl
 }
 
 func (h *Handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	if len(r.Question) > 0 {
 		question := r.Question[0]
 		log.Printf("DNS Query: %s %s", question.Name, dns.TypeToString[question.Qtype])
+
+		domain := strings.ToLower(strings.TrimSuffix(question.Name, "."))
+
+		if h.blocklist != nil && h.blocklist.IsBlocked(domain) {
+			log.Printf("Blocked: %s", domain)
+			msg := new(dns.Msg)
+			msg.SetReply(r)
+			msg.SetRcode(r, dns.RcodeNameError)
+			w.WriteMsg(msg)
+			return
+		}
 
 		cacheKey := fmt.Sprintf("%s-%s", question.Name, dns.TypeToString[question.Qtype])
 

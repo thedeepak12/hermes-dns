@@ -1,0 +1,28 @@
+{
+  "blocklists": {
+    "ads": {
+      "enabled": true,
+      "sources": [
+        {
+          "name": "Hagezi Ultimate",
+          "url": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/wildcard/ultimate-onlydomains.txt",
+          "format": "hosts",
+          "update_interval": "8h0m0s",
+          "local_path": "./blocklists/hagezi-ultimate.txt"
+        }
+      ]
+    },
+    "malware": {
+      "enabled": true,
+      "sources": [
+        {
+          "name": "Hagezi TIF",
+          "url": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/wildcard/tif-onlydomains.txt",
+          "format": "hosts",
+          "update_interval": "8h0m0s",
+          "local_path": "./blocklists/hagezi-tif.txt"
+        }
+      ]
+    }
+  }
+}
