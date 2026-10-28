@@ -18,3 +18,7 @@ cache:
   enabled: true
   max_size: 10000
   default_ttl: 3600
+logging:
+  enabled: true
+  log_file: "./logs/queries.log"
+  format: "json"

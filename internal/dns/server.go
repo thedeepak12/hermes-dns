@@ -12,6 +12,7 @@ import (
 	"github.com/thedeepak12/hermes-dns/internal/blocklist"
 	"github.com/thedeepak12/hermes-dns/internal/cache"
 	"github.com/thedeepak12/hermes-dns/internal/config"
+	"github.com/thedeepak12/hermes-dns/internal/logger"
 )
 
 type Server struct {
@@ -20,18 +21,21 @@ type Server struct {
 	handler  *Handler
 	resolver *Resolver
 	cache    *cache.Cache
+	logger   *logger.Logger
 }
 
 func NewServer(cfg *config.Config) *Server {
 	resolver := NewResolver(cfg)
 	cache, _ := cache.New(&cfg.Cache)
-	handler := NewHandler(resolver, cache)
+	logger, _ := logger.New(cfg.Logging.LogFile, cfg.Logging.Enabled)
+	handler := NewHandler(resolver, cache, logger)
 
 	return &Server{
 		config:   cfg,
 		resolver: resolver,
 		handler:  handler,
 		cache:    cache,
+		logger:   logger,
 	}
 }
 
@@ -86,6 +90,7 @@ func (s *Server) Start() error {
 	}
 
 	defer s.cache.Close()
+	defer s.logger.Close()
 
 	log.Println("DNS server stopped")
 	return nil
